@@ -1,9 +1,11 @@
 import mongoose from 'mongoose';
 import { monoDBUrl } from '../configs';
+import AppError from '../errors/AppError';
 
 const connectDB = async (): Promise<void> => {
   if (!monoDBUrl) {
-    throw new Error(
+    throw new AppError(
+      400,
       'MongoDB connection URI is not defined in the environment variables.',
     );
   }

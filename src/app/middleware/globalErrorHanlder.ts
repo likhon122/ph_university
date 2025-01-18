@@ -1,66 +1,68 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { NextFunction, Request, Response } from 'express';
+import { ErrorRequestHandler } from 'express';
 import { ZodError } from 'zod';
+import { envMode } from '../configs';
+import zodErrorHandler from '../errors/zodErrorHandler';
+import { TErrorSource } from '../interface/error.interface';
+import castErrorHandler from '../errors/castErrorHandler';
+import duplicateValueError from '../errors/duplicateValueError';
 
-const globalErrorHandler = (
-  err: any,
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  // Handle ZodError (validation error)
-  if (err instanceof ZodError) {
-    const zodErrors = err.errors.map((e: any) => ({
-      path: e.path.join('.'),
-      message: e.message,
-    }));
-
-    res.status(400).json({
-      message: 'Validation error',
-      success: false,
-      error: {
-        name: 'ZodError',
-        errors: zodErrors,
-      },
-      stack: 'No stack trace available',
-    });
-    return;
-  }
-
-  // Handle Duplicate Key Error (MongoError with code 11000)
-  if (err.code === 11000) {
-    // Get the name of the field causing the duplicate key error (e.g., "email")
-    const duplicateField = Object.keys(err.keyValue)[0];
-    const duplicateValue = err.keyValue[duplicateField];
-
-    res.status(400).json({
-      message: `Duplicate value error: The ${duplicateField} "${duplicateValue}" is already in use. Please choose a different ${duplicateField}.`,
-      success: false,
-      error: {
-        name: err.name,
-        errors: {
-          [duplicateField]: `The ${duplicateField} "${duplicateValue}" is already registered.`,
-        },
-      },
-      stack: `MongoServerError: Duplicate key error on ${duplicateField}: "${duplicateValue}". Full error details: ${err.message}`,
-    });
-    return;
-  }
-
-  // Handle other errors
-  const firstStackLine =
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  // Initialize the all errors object property
+  let statusCode: number = err.statusCode || 500;
+  let message: string = err.message || 'Something went wrong';
+  let errorSources: TErrorSource[] = [
+    {
+      path: '',
+      message: err.message || 'Something went wrong',
+    },
+  ];
+  let stack: string =
     'Error: ' +
     (err.stack?.split('\n')[1]?.trim() || 'No stack trace available');
 
-  res.status(500).json({
-    message: err.message,
+  // Handle ZodError (validation error)
+  if (err instanceof ZodError) {
+    const zodErrors = zodErrorHandler(err);
+    const formattedStack = err.stack
+      ? err.stack
+          .split('\n')
+          .filter(line => line.includes('ph_university'))
+          .map(line => line.trim())
+          .join('\n')
+      : 'No stack trace available';
+
+    // Enhanced stack trace formatting
+    statusCode = zodErrors.statusCode;
+    message = zodErrors.message;
+    errorSources = zodErrors.errorSources;
+    stack = formattedStack;
+
+    // Handle Mongoose CastError (invalid ObjectId)
+  } else if (err.name === 'CastError' && err.kind === 'ObjectId') {
+    const castError = castErrorHandler(err);
+
+    // Enhanced stack trace formatting
+    statusCode = castError.statusCode;
+    message = castError.message;
+    errorSources = castError.errorSources;
+
+    // Handle Duplicate Key Error (MongoError with code 11000)
+  } else if (err.code === 11000) {
+    const duplicateError = duplicateValueError(err);
+
+    // Enhanced stack trace formatting
+    statusCode = duplicateError.statusCode;
+    message = duplicateError.message;
+    errorSources = duplicateError.errorSources;
+    // Handle other errors
+  }
+
+  res.status(statusCode).json({
     success: false,
-    error: {
-      name: err.name,
-      errors: (err as any).errors || {},
-    },
-    stack: firstStackLine,
+    message,
+    errorSources,
+    stack: envMode === 'development' ? stack : null,
   });
   return;
 };

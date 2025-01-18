@@ -2,41 +2,39 @@ import { Response } from 'express';
 
 type SuccessResponse = {
   success: true;
-  successMessage: string;
+  message: string;
   statusCode: number;
   data: object | [] | string | number | boolean;
-  nextUrl: object;
 };
 
 const successResponse = (
   res: Response,
-  { success, successMessage, statusCode, data, nextUrl }: SuccessResponse,
+  { success, message, statusCode, data }: SuccessResponse,
 ) => {
   res.status(statusCode).send({
     success,
-    successMessage,
-    statusCode,
+    message,
     data,
-    nextUrl,
   });
 };
 
 type ErrorResponse = {
   success: false;
-  errorMessage: string | object;
+  message: string | object;
   statusCode: number;
   nextUrl: object;
+  stack?: string;
 };
 
 const errorResponse = (
   res: Response,
-  { success, errorMessage, statusCode, nextUrl }: ErrorResponse,
+  { success, message, statusCode, nextUrl, stack }: ErrorResponse,
 ) => {
   res.status(statusCode).send({
     success,
-    errorMessage,
-    statusCode,
+    message,
     nextUrl,
+    stack: process.env.NODE_ENV === 'development' ? stack : {},
   });
 };
 

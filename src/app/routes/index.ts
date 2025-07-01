@@ -1,4 +1,5 @@
 import { Router } from 'express';
+
 import studentRoute from '../modules/student/student.routes';
 import userRouter from '../modules/users/users.routes';
 import academicSemesterRoutes from '../modules/academicSemester/academicSemester.routes';
@@ -9,6 +10,7 @@ import adminRoutes from '../modules/admin/admin.routes';
 import courseRoutes from '../modules/course/course.routes';
 import semesterRegistrationRouter from '../modules/semesterRegistration/semesterRegistration.route';
 import offeredCourseRouter from '../modules/offeredCourse/offeredCourse.routes';
+import authRouter from '../modules/auth/auth.routes';
 
 const router = Router();
 
@@ -52,6 +54,10 @@ const routeModule = [
   {
     path: '/offered-courses',
     router: offeredCourseRouter,
+  },
+  {
+    path: '/auth',
+    router: authRouter,
   },
 ];
 

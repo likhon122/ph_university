@@ -124,7 +124,7 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
     throw new AppError(400, 'To create a Faculty, role must be Faculty');
   }
 
-  userData.role = 'Faculty';
+  userData.role = 'faculty';
 
   // make a custom id
   const facultyId = await generateFacultyId();
@@ -198,7 +198,7 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
     userData.password = defaultPassword;
   }
 
-  if (payload.role && payload.role !== 'Admin') {
+  if (payload.role && payload.role !== 'admin') {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       'To create a Admin, role must be Admin',
@@ -208,7 +208,7 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
   // Generate a custom id A-lastId+1
   const adminId = await generateAdminId();
 
-  userData.role = 'Admin';
+  userData.role = 'admin';
   userData.id = adminId;
 
   // create a session
@@ -230,7 +230,7 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
     if (newUser) {
       payload.user = newUser._id;
       payload.id = adminId;
-      payload.role = 'Admin';
+      payload.role = 'admin';
     }
 
     const [newAdmin] = await Admin.create([payload], {

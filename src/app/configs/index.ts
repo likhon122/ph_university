@@ -8,6 +8,8 @@ const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5001';
 const defaultPassword = process.env.DEFAULT_PASSWORD || '1234';
 const bcryptSaltRounds = process.env.BCRYPT_SALT_ROUNDS;
 const envMode = process.env.NODE_ENV || 'development';
+const jwt_access_secret =
+  process.env.JWT_ACCESS_SECRET || '88afcc98e75f290ab4fd0290651756dad3fdcc';
 
 export {
   PORT,
@@ -16,4 +18,5 @@ export {
   defaultPassword,
   bcryptSaltRounds,
   envMode,
+  jwt_access_secret,
 };

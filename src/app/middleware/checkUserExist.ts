@@ -13,13 +13,11 @@ const checkUserIsExit = catchAsync(async (req, res, next) => {
     throw new AppError(
       400,
       'Student already exist. Please try with another email or login.',
-      {},
     );
   } else if (studentIsExist?.contactNo) {
     throw new AppError(
       400,
       'Contact number already exist. Please try with another contact number or login.',
-      {},
     );
   }
   next();

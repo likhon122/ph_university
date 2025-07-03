@@ -4,12 +4,14 @@ dotenv.config();
 
 const PORT = process.env.PORT;
 const monoDBUrl = process.env.MONGODB_ATLAS_URL;
-const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5001';
-const defaultPassword = process.env.DEFAULT_PASSWORD || '1234';
+const frontendUrl = process.env.FRONTEND_URL || '';
+const defaultPassword = process.env.DEFAULT_PASSWORD || '';
 const bcryptSaltRounds = process.env.BCRYPT_SALT_ROUNDS;
-const envMode = process.env.NODE_ENV || 'development';
-const jwt_access_secret =
-  process.env.JWT_ACCESS_SECRET || '88afcc98e75f290ab4fd0290651756dad3fdcc';
+const envMode = process.env.NODE_ENV || '';
+const jwt_access_secret = process.env.JWT_ACCESS_SECRET || '';
+const jwt_refresh_secret = process.env.JWT_REFRESH_SECRET || '';
+const jwt_access_expires_in = process.env.JWT_ACCESS_EXPIRES_IN || '';
+const jwt_refresh_expires_in = process.env.JWT_REFRESH_EXPIRES_IN || '';
 
 export {
   PORT,
@@ -19,4 +21,7 @@ export {
   bcryptSaltRounds,
   envMode,
   jwt_access_secret,
+  jwt_refresh_secret,
+  jwt_access_expires_in,
+  jwt_refresh_expires_in,
 };

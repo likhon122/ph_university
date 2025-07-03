@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import globalErrorHandler from './app/middleware/globalErrorHanlder';
 import notFoundErrorHandler from './app/middleware/notFoundErrorHandler';
 import router from './app/routes';
@@ -15,6 +16,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 // All Routes are here in routes/index.ts

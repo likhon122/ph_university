@@ -8,6 +8,8 @@ export type TUser = {
   role: string;
   status: string;
   isDeleted: boolean;
+  passwordChangeAt: Date;
+  passwordChangeIp: string;
 };
 
 export interface TCreateUser {
@@ -17,10 +19,17 @@ export interface TCreateUser {
   role: string;
   status: 'in-progress' | 'blocked';
   isDeleted: boolean;
+  passwordChangeAt?: Date | null;
+  passwordChangeIp?: string | null;
 }
 
 export interface UserModelType extends Model<TCreateUser> {
   isUserExistByCustomId(id: string): Promise<TUser>;
+  hashPassword(password: string): Promise<string>;
+  isJwtIssuedBeforePasswordChange(
+    passwordChangedAt: Date,
+    jwtIssuedAt: number,
+  ): boolean;
 }
 
 export type TUserRoles = keyof typeof User_Roles;

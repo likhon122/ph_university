@@ -8,6 +8,7 @@ const validateRequest = (schema: AnyZodObject) => {
       await schema.parseAsync({
         body: req.body,
         params: req.params,
+        cookies: req.cookies,
       });
 
       // If all is ok then send request in controller

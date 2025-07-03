@@ -19,6 +19,14 @@ const userSchema = new Schema<TCreateUser, UserModelType>(
       type: Boolean,
       default: true,
     },
+    passwordChangeAt: {
+      type: Date,
+      default: null,
+    },
+    passwordChangeIp: {
+      type: String,
+      default: null,
+    },
     role: {
       type: String,
       enum: ['student', 'faculty', 'admin'],
@@ -63,6 +71,22 @@ userSchema.statics.isUserExistByCustomId = async function (id: string) {
   return null;
 };
 
+userSchema.statics.hashPassword = async function (password: string) {
+  if (!password) {
+    throw new Error('Password is required to hash.');
+  }
+  const hashedPassword = await bcrypt.hash(password, Number(bcryptSaltRounds));
+  return hashedPassword;
+};
+
+userSchema.statics.isJwtIssuedBeforePasswordChange = function (
+  passwordChangedAt: Date,
+  jwtIssuedAt: number,
+) {
+  const passwordChangeTime = new Date(passwordChangedAt).getTime() / 1000; // Convert to seconds
+
+  return passwordChangeTime > jwtIssuedAt;
+};
 const User = model<TCreateUser, UserModelType>('user', userSchema);
 
 export default User;

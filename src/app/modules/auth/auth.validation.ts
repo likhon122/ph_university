@@ -7,4 +7,31 @@ const loginValidation = z.object({
   }),
 });
 
-export { loginValidation };
+const changePasswordValidation = z.object({
+  body: z.object({
+    oldPassword: z
+      .string()
+      .min(1, 'Old password is required for change password'),
+    newPassword: z
+      .string()
+      .min(1, 'New password is required for change password'),
+  }),
+});
+
+const refreshTokenValidation = z.object({
+  cookies: z.object(
+    {
+      refreshToken: z
+        .string({
+          required_error: 'Refresh token is required',
+          invalid_type_error: 'Refresh token must be a string',
+        })
+        .min(1, 'Refresh token is required'),
+    },
+    {
+      required_error: 'Cookies object is required for refresh token validation',
+    },
+  ),
+});
+
+export { loginValidation, changePasswordValidation, refreshTokenValidation };

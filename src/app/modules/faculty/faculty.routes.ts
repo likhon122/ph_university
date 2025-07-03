@@ -7,10 +7,16 @@ import {
 } from './faculty.controller';
 import { updateFacultyValidationSchema } from './faculty.validation';
 import validateRequest from '../../middleware/validateRequest';
+import auth from '../../middleware/auth';
+import { User_Roles } from '../users/user.constant';
 
 const facultyRoutes = express.Router();
 
-facultyRoutes.get('/get-all-faculties', getAllFaculties);
+facultyRoutes.get(
+  '/get-all-faculties',
+  auth(User_Roles.admin, User_Roles.faculty),
+  getAllFaculties,
+);
 facultyRoutes.get('/:id', getSingleFaculty);
 
 facultyRoutes.patch(

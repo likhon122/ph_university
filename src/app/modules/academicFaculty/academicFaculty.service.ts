@@ -18,7 +18,7 @@ const getSingleAcademicFacultyFromDB = async (facultyId: string) => {
   const academicFaculty = await AcademicFaculty.findById(facultyId);
 
   if (!academicFaculty) {
-    throw new AppError(404, "Academic faculty doesn't exist with this ID", {});
+    throw new AppError(404, "Academic faculty doesn't exist with this ID");
   }
 
   return academicFaculty;
@@ -37,7 +37,6 @@ const updateAcademicFacultyFromDB = async (
     throw new AppError(
       404,
       "Academic faculty doesn't exist with this ID or something went wrong! Please try again and make sure you provide correct facultyId!",
-      {},
     );
   }
 
@@ -45,7 +44,6 @@ const updateAcademicFacultyFromDB = async (
     throw new AppError(
       400,
       'Academic faculty name already exist! Please choose another name',
-      {},
     );
   }
 
@@ -58,7 +56,7 @@ const updateAcademicFacultyFromDB = async (
   );
 
   if (!academicFaculty) {
-    throw new AppError(500, 'Something went wrong! Please try again', {});
+    throw new AppError(500, 'Something went wrong! Please try again');
   }
   return academicFaculty;
 };

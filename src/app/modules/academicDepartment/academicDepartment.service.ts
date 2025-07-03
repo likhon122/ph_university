@@ -22,11 +22,7 @@ const getSingleAcademicDepartmentFromDB = async (departmentId: string) => {
     await AcademicDepartment.findById(departmentId).populate('academicFaculty');
 
   if (!academicDepartment) {
-    throw new AppError(
-      404,
-      "Academic Department doesn't exist with this ID",
-      {},
-    );
+    throw new AppError(404, "Academic Department doesn't exist with this ID");
   }
 
   return academicDepartment;
@@ -48,7 +44,6 @@ const updateAcademicDepartmentFromDB = async (
     throw new AppError(
       404,
       "Academic department doesn't exist with this ID or something went wrong! Please try again and make sure you provide correct departmentId!",
-      {},
     );
   }
   return academicDepartment;

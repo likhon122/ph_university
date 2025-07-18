@@ -26,7 +26,7 @@ export type TCreateStudent = {
   user: Types.ObjectId;
   name: TStudentName;
   gender: { type: ['male' | 'female'] };
-  dateOfBirth: string;
+  dateOfBirth: Date;
   email: string;
   contactNo: string;
   emergencyContactNo: string;
@@ -35,10 +35,10 @@ export type TCreateStudent = {
   bloodGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
   guardian: TGuardianDetails;
   localGuardian: TGuardianDetails;
-  profileImage?: string;
+  profileImage: string | null;
   designation: string;
-  academicDepartment: string;
-  admissionSemester: string;
+  academicDepartment: Types.ObjectId;
+  admissionSemester: Types.ObjectId;
   role: string;
   isDeleted: boolean;
 };

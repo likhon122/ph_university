@@ -17,7 +17,7 @@ const guardianSchema = new Schema<TGuardianDetails>({
     middleName: { type: String, required: true },
     lastName: { type: String, required: true },
   },
-  email: { type: String, unique: true },
+  email: { type: String },
   contactNo: { type: String },
   relation: { type: String },
   address: {
@@ -28,7 +28,7 @@ const guardianSchema = new Schema<TGuardianDetails>({
 
 const studentSchema = new Schema<TCreateStudent>(
   {
-    id: { type: String, required: true },
+    id: { type: String, required: true, unique: true },
     user: {
       type: Schema.Types.ObjectId,
       ref: 'user',
@@ -37,7 +37,7 @@ const studentSchema = new Schema<TCreateStudent>(
     },
     name: studentName,
     gender: { type: String, enum: ['male', 'female'], required: true },
-    dateOfBirth: { type: String, required: true },
+    dateOfBirth: { type: Date, required: true },
     email: { type: String, required: true, unique: true },
     contactNo: { type: String, required: true, unique: true },
     emergencyContactNo: { type: String, required: true },
@@ -52,8 +52,15 @@ const studentSchema = new Schema<TCreateStudent>(
     localGuardian: guardianSchema,
     profileImage: { type: String },
     designation: { type: String, required: true },
-    academicDepartment: { type: String, required: true },
-    admissionSemester: { type: String, required: true },
+    academicDepartment: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'academic_department',
+    },
+    admissionSemester: {
+      type: Schema.Types.ObjectId,
+      ref: 'academic_semester',
+    },
     role: { type: String, required: true },
     isDeleted: { type: Boolean, default: false },
   },

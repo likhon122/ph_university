@@ -89,4 +89,15 @@ const createStudentValidation = z.object({
   }),
 });
 
+// Helper function for validation
+export const runValidation = (schema: any, data: any) => {
+  try {
+    const validData = schema.parse(data);
+    return { success: true, data: validData };
+  } catch (error) {
+    return { success: false, error };
+  }
+};
+
 export { createStudentValidation };
+export const studentSchemaValidation = createStudentValidation;

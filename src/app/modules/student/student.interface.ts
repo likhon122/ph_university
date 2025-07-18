@@ -22,10 +22,10 @@ export type TGuardianDetails = {
 };
 
 export type TCreateStudent = {
-  id: string;
-  user: Types.ObjectId;
+  id?: string;
+  user?: Types.ObjectId;
   name: TStudentName;
-  gender: { type: ['male' | 'female'] };
+  gender: 'male' | 'female';
   dateOfBirth: string;
   email: string;
   contactNo: string;
@@ -39,6 +39,6 @@ export type TCreateStudent = {
   designation: string;
   academicDepartment: string;
   admissionSemester: string;
-  role: string;
-  isDeleted: boolean;
+  role?: string;
+  isDeleted?: boolean;
 };

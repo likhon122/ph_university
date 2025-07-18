@@ -1,3 +1,7 @@
 node_modules
 dist
 .env
+
+# Frontend build artifacts
+frontend/build
+frontend/node_modules

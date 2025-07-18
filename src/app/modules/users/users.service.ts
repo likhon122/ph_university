@@ -16,10 +16,13 @@ import Faculty from '../faculty/faculty.model';
 import { TAdmin } from '../admin/admin.interface';
 import generateAdminId from '../../utils/generateAdminId';
 import { Admin } from '../admin/admin.model';
+import { JwtPayload } from 'jsonwebtoken';
+import uploadImage from '../../utils/uploadImage';
 
 const createStudentService = async (
   payload: TCreateStudent,
   password: string,
+  file?: Express.Multer.File,
 ) => {
   const userData: Partial<TCreateUser> = {};
 
@@ -31,6 +34,7 @@ const createStudentService = async (
 
   // Set the role of the user
   userData.role = 'student';
+  userData.email = payload.email;
 
   // make a custom id
   const [academicDepartmentExist, academicSemesterInfo] = await Promise.all([
@@ -44,6 +48,12 @@ const createStudentService = async (
 
   if (!academicDepartmentExist) {
     throw new AppError(404, "Academic Department doesn't exist with this ID");
+  }
+
+  let profileImageUrl: string = '';
+  // Upload the profile image if it exists
+  if (file) {
+    profileImageUrl = await uploadImage(file, payload.name.firstName);
   }
 
   // Make a session of Transaction
@@ -72,6 +82,8 @@ const createStudentService = async (
       payload.role = 'student';
       payload.id = userData.id;
     }
+
+    payload.profileImage = profileImageUrl.length ? profileImageUrl : null;
 
     // Create a student transaction(2)
     const [student] = await Student.create([payload], { session });
@@ -111,8 +123,19 @@ const createStudentService = async (
   }
 };
 
-const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
+const createFacultyIntoDB = async (
+  password: string,
+  payload: TFaculty,
+  file?: Express.Multer.File,
+) => {
   const userData: Partial<TCreateUser> = {};
+
+  const academicDepartment = await AcademicDepartment.findById(
+    payload.academicDepartment,
+  );
+  if (!academicDepartment) {
+    throw new AppError(404, "Academic Department doesn't exist with this ID");
+  }
 
   if (password) {
     userData.password = password;
@@ -125,12 +148,19 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
   }
 
   userData.role = 'faculty';
+  userData.email = payload.email;
 
   // make a custom id
   const facultyId = await generateFacultyId();
 
   // assign the id to the user data
   userData.id = facultyId;
+
+  // Upload the profile image if it exists
+  let profileImageUrl: string = '';
+  if (file) {
+    profileImageUrl = await uploadImage(file, payload.name.firstName);
+  }
 
   const session = await mongoose.startSession();
 
@@ -155,6 +185,8 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
     if (newUser) {
       payload.user = newUser._id;
     }
+
+    payload.profileImage = profileImageUrl.length ? profileImageUrl : null;
 
     const [newFacultyWithoutPopulate] = await Faculty.create([payload], {
       session,
@@ -189,7 +221,11 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
   }
 };
 
-const createAdminIntoDB = async (password: string, payload: TAdmin) => {
+const createAdminIntoDB = async (
+  password: string,
+  payload: TAdmin,
+  file?: Express.Multer.File,
+) => {
   const userData: Partial<TCreateUser> = {};
 
   if (password) {
@@ -209,7 +245,14 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
   const adminId = await generateAdminId();
 
   userData.role = 'admin';
+  userData.email = payload.email;
   userData.id = adminId;
+
+  // Upload the profile image if it exists
+  let profileImageUrl: string = '';
+  if (file) {
+    profileImageUrl = await uploadImage(file, payload.name.firstName);
+  }
 
   // create a session
   const session = await mongoose.startSession();
@@ -233,6 +276,10 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
       payload.role = 'admin';
     }
 
+    payload.profileImage = profileImageUrl.length ? profileImageUrl : null;
+
+    console.log('creating admin with payload', payload);
+
     const [newAdmin] = await Admin.create([payload], {
       session,
     });
@@ -255,4 +302,63 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
   }
 };
 
-export { createStudentService, createFacultyIntoDB, createAdminIntoDB };
+const getMeFromDB = async (payload: JwtPayload) => {
+  const { userId, role } = payload;
+
+  let user = null;
+
+  if (role === 'student') {
+    user = await Student.findOne({ id: userId }).populate(
+      'user academicDepartment admissionSemester',
+    );
+  } else if (role === 'faculty') {
+    user = await Faculty.findOne({ id: userId }).populate(
+      'user academicDepartment',
+    );
+  } else if (role === 'admin') {
+    user = await Admin.findOne({ id: userId }).populate('user');
+  }
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  return user;
+};
+
+const updateStatusIntoDB = async (
+  userId: string,
+  status: 'in-progress' | 'blocked',
+) => {
+  if (!userId) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'User id is required to update status',
+    );
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid user ID format');
+  }
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found with this ID');
+  }
+
+  console.log(user);
+
+  user.status = status;
+  await user.save();
+
+  return user;
+};
+
+export {
+  createStudentService,
+  createFacultyIntoDB,
+  createAdminIntoDB,
+  getMeFromDB,
+  updateStatusIntoDB,
+};

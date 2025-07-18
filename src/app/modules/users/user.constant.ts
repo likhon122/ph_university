@@ -4,4 +4,6 @@ const User_Roles = {
   faculty: 'faculty',
 } as const;
 
-export { User_Roles };
+const userStatus = ['in-progress', 'blocked'];
+
+export { User_Roles, userStatus };

@@ -4,6 +4,8 @@ import {
   createAdminIntoDB,
   createFacultyIntoDB,
   createStudentService,
+  getMeFromDB,
+  updateStatusIntoDB,
 } from './users.service';
 import catchAsync from '../../utils/catchAsync';
 import { successResponse } from '../../utils/response';
@@ -11,7 +13,11 @@ import { successResponse } from '../../utils/response';
 const createStudent = catchAsync(async (req, res) => {
   const { password, student } = req.body;
 
-  const { newUser, newStudent } = await createStudentService(student, password);
+  const { newUser, newStudent } = await createStudentService(
+    student,
+    password,
+    req.file,
+  );
 
   return successResponse(res, {
     statusCode: 201,
@@ -24,9 +30,13 @@ const createStudent = catchAsync(async (req, res) => {
   });
 });
 
-const createFaculty = catchAsync(async (req, res) => {
+const createFaculty = catchAsync(async (req, res,) => {
   const { password, faculty } = req.body;
-  const { newUser, newFaculty } = await createFacultyIntoDB(password, faculty);
+  const { newUser, newFaculty } = await createFacultyIntoDB(
+    password,
+    faculty,
+    req.file,
+  );
 
   return successResponse(res, {
     statusCode: 201,
@@ -39,7 +49,11 @@ const createFaculty = catchAsync(async (req, res) => {
 const createAdmin = catchAsync(async (req, res) => {
   const { password, admin: adminData } = req.body;
 
-  const { newUser, newAdmin } = await createAdminIntoDB(password, adminData);
+  const { newUser, newAdmin } = await createAdminIntoDB(
+    password,
+    adminData,
+    req.file,
+  );
 
   successResponse(res, {
     statusCode: httpStatus.OK,
@@ -49,4 +63,28 @@ const createAdmin = catchAsync(async (req, res) => {
   });
 });
 
-export { createStudent, createFaculty, createAdmin };
+const getMe = catchAsync(async (req, res) => {
+  const user = req.user;
+
+  const result = await getMeFromDB(user);
+
+  return successResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User fetched successfully',
+    data: result,
+  });
+});
+
+const updateStatus = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const result = await updateStatusIntoDB(id, req.body.status);
+  return successResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User status is updated successfully',
+    data: result,
+  });
+});
+
+export { createStudent, createFaculty, createAdmin, getMe, updateStatus };

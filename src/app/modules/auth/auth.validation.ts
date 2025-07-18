@@ -34,4 +34,25 @@ const refreshTokenValidation = z.object({
   ),
 });
 
-export { loginValidation, changePasswordValidation, refreshTokenValidation };
+const forgotPasswordValidation = z.object({
+  body: z.object({
+    id: z.string().min(1, 'ID is required for forgot password'),
+  }),
+});
+
+const resetPasswordValidation = z.object({
+  body: z.object({
+    id: z.string().min(1, 'ID is required for reset password'),
+    newPassword: z
+      .string()
+      .min(1, 'New password is required for reset password'),
+  }),
+});
+
+export {
+  loginValidation,
+  changePasswordValidation,
+  refreshTokenValidation,
+  forgotPasswordValidation,
+  resetPasswordValidation,
+};

@@ -35,7 +35,7 @@ export type TCreateStudent = {
   bloodGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
   guardian: TGuardianDetails;
   localGuardian: TGuardianDetails;
-  profileImage?: string;
+  profileImage: string | null;
   designation: string;
   academicDepartment: Types.ObjectId;
   admissionSemester: Types.ObjectId;

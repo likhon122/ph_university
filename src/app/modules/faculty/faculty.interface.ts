@@ -30,7 +30,7 @@ export type TFaculty = {
   bloodGroup?: TBloodGroup;
   presentAddress: string;
   permanentAddress: string;
-  profileImg?: string;
+  profileImage: string | null;
   academicDepartment: Types.ObjectId;
   isDeleted: boolean;
   role: string;

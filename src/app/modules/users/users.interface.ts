@@ -3,6 +3,7 @@ import { User_Roles } from './user.constant';
 
 export type TUser = {
   id: string;
+  email: string;
   password: string;
   needsPasswordChange: string;
   role: string;
@@ -14,6 +15,7 @@ export type TUser = {
 
 export interface TCreateUser {
   id: string;
+  email: string;
   password: string;
   needsPasswordChange: boolean;
   role: string;

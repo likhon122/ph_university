@@ -2,6 +2,7 @@ import { TCreateUser, UserModelType } from './users.interface';
 import { Schema, model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { bcryptSaltRounds } from '../../configs';
+import { userStatus } from './user.constant';
 
 const userSchema = new Schema<TCreateUser, UserModelType>(
   {
@@ -9,6 +10,11 @@ const userSchema = new Schema<TCreateUser, UserModelType>(
       type: String,
       required: [true, 'Id is required to create a user.'],
       unique: true,
+    },
+    email: {
+      type: String,
+      required: [true, 'Email is required to create a user.'],
+      // unique: true,
     },
     password: {
       type: String,
@@ -34,7 +40,7 @@ const userSchema = new Schema<TCreateUser, UserModelType>(
     },
     status: {
       type: String,
-      enum: ['in-progress', 'blocked'],
+      enum: userStatus,
       default: 'in-progress',
     },
     isDeleted: {
@@ -49,12 +55,14 @@ userSchema.pre('save', async function (next) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this;
 
-  // Hash the password and save it
-  const hashedPassword = await bcrypt.hash(
-    user.password,
-    Number(bcryptSaltRounds),
-  );
-  user.password = hashedPassword;
+  if (user.isModified('password')) {
+    const hashedPassword = await bcrypt.hash(
+      user.password,
+      Number(bcryptSaltRounds),
+    );
+    user.password = hashedPassword;
+  }
+
   next();
 });
 

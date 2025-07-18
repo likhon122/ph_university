@@ -4,8 +4,10 @@ import getClientIp from '../../utils/getIpAddress';
 import { successResponse } from '../../utils/response';
 import {
   changePasswordHandler,
+  forgotPasswordHandler,
   loginUserHandler,
   refreshTokenHandler,
+  resetPasswordHandler,
 } from './auth.service';
 
 const loginUser = catchAsync(async (req, res) => {
@@ -58,4 +60,35 @@ const refreshToken = catchAsync(async (req, res) => {
   });
 });
 
-export { loginUser, changePassword, refreshToken };
+const forgotPassword = catchAsync(async (req, res) => {
+  // Call the service to handle forgot password logic
+  const result = await forgotPasswordHandler(req.body.id);
+
+  successResponse(res, {
+    success: true,
+    message: 'Password reset link sent to your! Please check your email.',
+    statusCode: 200,
+    data: { result },
+  });
+});
+
+const resetPassword = catchAsync(async (req, res) => {
+  const ip = getClientIp(req);
+  const token = req.headers.authorization;
+  await resetPasswordHandler(req.body, ip, token);
+
+  successResponse(res, {
+    success: true,
+    message: 'Password reset successfully',
+    statusCode: 200,
+    data: {},
+  });
+});
+
+export {
+  loginUser,
+  changePassword,
+  refreshToken,
+  forgotPassword,
+  resetPassword,
+};

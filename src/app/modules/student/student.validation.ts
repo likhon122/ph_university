@@ -142,6 +142,7 @@ const updateStudentValidationSchema = z.object({
         emergencyContactNo: z.string().optional(),
         presentAddress: z.string().optional(),
         permanentAddress: z.string().optional(),
+        profileImage: z.string().optional(),
         bloodGroup: z
           .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
           .optional(),

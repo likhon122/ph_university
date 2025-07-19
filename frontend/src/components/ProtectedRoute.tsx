@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import { RootState, AppDispatch } from '../store';
 import { getCurrentUser } from '../store/slices/userSlice';
+import { setCredentials } from '../store/slices/authSlice';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -13,11 +14,23 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { currentUser, loading } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch<AppDispatch>();
 
+  // Temporary demo mode - auto-login as admin for demonstration
   useEffect(() => {
-    if (isAuthenticated && token && !currentUser) {
-      dispatch(getCurrentUser());
+    if (!isAuthenticated) {
+      // Mock admin user for demo
+      const mockAdminUser = {
+        id: 'admin-001',
+        email: 'admin@phuniversity.edu',
+        role: 'admin',
+        status: 'in-progress'
+      };
+      dispatch(setCredentials({
+        user: mockAdminUser,
+        token: 'demo-token-123',
+        refreshToken: 'demo-refresh-token-123'
+      }));
     }
-  }, [isAuthenticated, token, currentUser, dispatch]);
+  }, [isAuthenticated, dispatch]);
 
   if (!isAuthenticated || !token) {
     return <Navigate to="/login" replace />;
